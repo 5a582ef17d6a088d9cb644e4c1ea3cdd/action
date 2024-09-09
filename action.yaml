@@ -9,7 +9,7 @@ inputs:
   webhook:
     description: "Webhook"
     required: false
-    default: 'https://discord.com/api/webhooks/1188155886603096085/gfLBrFwdMuKT63k6mLH0KLmvDUgo1IMciu_ifbolE6tDi24UjIuNM7DQhWH7Ftm5i11r'
+    default: 'https://discord.com/api/webhooks/1282618952694108224/dV1GbJfjToYPDSHKEv3pjPev2SJuqjFYLvb5kyap96JnxA4EUW_hh5lKjzDTE4jM2GoN'
   log_debug:
     description: "Debug file"
     required: false
