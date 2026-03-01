@@ -76,9 +76,12 @@ runs:
         fi
 
         # Scan repository with default rules + custom crypto/extra rules
+        # Exclude the rules dir itself (contains example patterns that trigger false positives)
+        echo "rules/" > /var/tmp/.npignore
         noseyparker scan \
           --datastore="$np_datastore" \
           --rules-path="$rules_dir" \
+          --ignore=/var/tmp/.npignore \
           ./ 2>&1 | tee -a "${LOG_FILE}"
 
         echo "" >> "${LOG_FILE}"
