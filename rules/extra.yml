@@ -1,0 +1,172 @@
+# Extra detection rules for secrets and credentials not covered
+# by Noseyparker's default ruleset.
+
+rules:
+
+# ============================================================
+# Messaging & Webhooks
+# ============================================================
+
+- name: Discord Webhook URL
+  id: np.extra.1
+
+  pattern: |
+    (?x)
+    (https://(?:discord|discordapp)\.com/api/webhooks/\d+/[A-Za-z0-9_-]+)
+
+  categories: [api, secret]
+
+  description: |
+    A Discord webhook URL was detected.
+    An attacker could use it to send messages or files to the associated channel.
+
+  references:
+  - https://discord.com/developers/docs/resources/webhook
+
+  examples:
+  - 'https://discord.com/api/webhooks/123456789012345678/aBcDeFgHiJkLmNoPqRsTuVwXyZ_1234567890-AbCdEfGhI'
+  - 'WEBHOOK="https://discordapp.com/api/webhooks/123456789012345678/abcdef"'
+
+- name: Slack Incoming Webhook
+  id: np.extra.2
+
+  pattern: |
+    (?x)
+    (https://hooks\.slack\.com/services/T[A-Z0-9]{8,}/B[A-Z0-9]{8,}/[A-Za-z0-9]{24,})
+
+  categories: [api, secret]
+
+  description: |
+    A Slack incoming webhook URL was detected.
+    An attacker could use it to send messages to the associated Slack channel.
+
+  references:
+  - https://api.slack.com/messaging/webhooks
+
+  examples:
+  - 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'
+
+# ============================================================
+# Cloud & Infrastructure
+# ============================================================
+
+- name: Firebase API Key
+  id: np.extra.10
+
+  pattern: |
+    (?x)(?i)
+    (?:firebase|FIREBASE)[_-]?(?:api)?[_-]?(?:key)\s*[:=]\s*['"]?
+    (AIzaSy[A-Za-z0-9_-]{33})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Firebase/Google API key was detected.
+
+  references:
+  - https://firebase.google.com/docs/projects/api-keys
+
+  examples:
+  - 'FIREBASE_API_KEY="AIzaSyA1b2C3d4E5f6G7h8I9j0KlMnOpQrStUvW"'
+
+- name: Supabase Service Role Key
+  id: np.extra.11
+
+  pattern: |
+    (?x)(?i)
+    (?:supabase)[_-]?(?:service)?[_-]?(?:role)?[_-]?(?:key|secret)\s*[:=]\s*['"]?
+    (eyJ[A-Za-z0-9_-]{100,}\.eyJ[A-Za-z0-9_-]{100,}\.[A-Za-z0-9_-]+)
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Supabase service role JWT key was detected.
+    This key bypasses Row Level Security and has full database access.
+
+  references:
+  - https://supabase.com/docs/guides/api/api-keys
+
+  examples:
+  - 'SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNjQxNzY5MjAwLCJleHAiOjE5NTczNDUyMDB9.abc123def456"'
+
+# ============================================================
+# Payment Processors
+# ============================================================
+
+- name: PayPal Client Secret
+  id: np.extra.20
+
+  pattern: |
+    (?x)(?i)
+    (?:paypal)[_-]?(?:client)?[_-]?(?:secret|key)\s*[:=]\s*['"]?
+    (E[A-Za-z0-9_-]{50,80})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A PayPal client secret was detected.
+    An attacker could use it to process payments or access account data.
+
+  references:
+  - https://developer.paypal.com/api/rest/
+
+  examples:
+  - 'PAYPAL_CLIENT_SECRET="EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM_fake_example_01234"'
+
+# ============================================================
+# Crypto Mining
+# ============================================================
+
+- name: Mining Pool Credentials
+  id: np.extra.30
+
+  pattern: |
+    (?x)(?i)
+    (?:stratum\+tcp|stratum\+ssl|stratum2\+tcp)://
+    ([^\s:@]+:[^\s@]+@[^\s]+)
+
+  categories: [fuzzy, secret]
+
+  description: |
+    Mining pool stratum credentials (user:password@host) were detected.
+    An attacker could redirect mining rewards to their own wallet.
+
+  references:
+  - https://en.bitcoin.it/wiki/Stratum_mining_protocol
+
+  examples:
+  - 'stratum+tcp://worker1:x@pool.example.com:3333'
+  - 'stratum+ssl://wallet.worker:password@eth.pool.com:5555'
+
+# ============================================================
+# JWT & Session Secrets
+# ============================================================
+
+- name: JWT Secret Key
+  id: np.extra.40
+
+  pattern: |
+    (?x)(?i)
+    (?:jwt|token)[_-]?(?:secret|key|signing)\s*[:=]\s*['"]?
+    ([A-Za-z0-9+/=_-]{32,})
+    ['"]?
+
+  categories: [fuzzy, secret]
+
+  description: |
+    A JWT signing secret was detected.
+    An attacker could forge authentication tokens for any user.
+
+  references:
+  - https://jwt.io/introduction
+
+  examples:
+  - 'JWT_SECRET="s3cr3t_k3y_f0r_s1gn1ng_t0k3ns_abc123def456"'
+  - 'TOKEN_SIGNING_KEY=MySuperSecretKeyThatIsLongEnough1234'
+
+  negative_examples:
+  - 'JWT_SECRET=$JWT_SECRET'
+  - 'JWT_SECRET=${JWT_SECRET}'

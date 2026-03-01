@@ -1,0 +1,267 @@
+# Detection rules for AI/ML platform API keys.
+# Covers platforms NOT in Noseyparker defaults (which has OpenAI, Anthropic, Groq, HuggingFace).
+
+rules:
+
+- name: Cohere API Key
+  id: np.ai.1
+
+  pattern: |
+    (?x)(?i)
+    (?:cohere)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{40})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Cohere API key was detected.
+    An attacker could use it to consume API credits or access fine-tuned models.
+
+  references:
+  - https://docs.cohere.com/docs/rate-limits
+
+  examples:
+  - 'COHERE_API_KEY="aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234"'
+
+- name: Mistral API Key
+  id: np.ai.2
+
+  pattern: |
+    (?x)(?i)
+    (?:mistral)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Mistral AI API key was detected.
+    An attacker could use it to consume API credits.
+
+  references:
+  - https://docs.mistral.ai/api/
+
+  examples:
+  - 'MISTRAL_API_KEY="aBcDeFgHiJkLmNoPqRsTuVwXyZ123456"'
+
+- name: DeepSeek API Key
+  id: np.ai.3
+
+  pattern: |
+    (?x)(?i)
+    (?:deepseek)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    (sk-[A-Za-z0-9]{32,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A DeepSeek API key was detected.
+    An attacker could use it to consume API credits.
+
+  references:
+  - https://platform.deepseek.com/api-docs
+
+  examples:
+  - 'DEEPSEEK_API_KEY="sk-aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890"'
+
+- name: Replicate API Token
+  id: np.ai.4
+
+  pattern: |
+    (?x)(?i)
+    (?:replicate)[_-]?(?:api)?[_-]?(?:token|key)\s*[:=]\s*['"]?
+    (r8_[A-Za-z0-9]{37,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Replicate API token was detected.
+    An attacker could run models and consume compute credits.
+
+  references:
+  - https://replicate.com/docs/reference/http
+
+  examples:
+  - 'REPLICATE_API_TOKEN="r8_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890ab"'
+
+- name: Replicate API Token (prefixed, standalone)
+  id: np.ai.5
+
+  pattern: |
+    (?x)
+    \b(r8_[A-Za-z0-9]{37,})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Replicate API token with r8_ prefix was detected.
+
+  references:
+  - https://replicate.com/docs/reference/http
+
+  examples:
+  - 'r8_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890ab'
+
+- name: Together AI API Key
+  id: np.ai.6
+
+  pattern: |
+    (?x)(?i)
+    (?:together|togetherai|together_ai)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([a-f0-9]{64})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Together AI API key was detected.
+    An attacker could run inference, fine-tuning jobs, and consume credits.
+
+  references:
+  - https://docs.together.ai/reference/authentication
+
+  examples:
+  - 'TOGETHER_API_KEY="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: Perplexity API Key
+  id: np.ai.7
+
+  pattern: |
+    (?x)(?i)
+    (?:perplexity|pplx)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    (pplx-[A-Za-z0-9]{48})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Perplexity AI API key was detected.
+
+  references:
+  - https://docs.perplexity.ai/guides/getting-started
+
+  examples:
+  - 'PERPLEXITY_API_KEY="pplx-aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234567890"'
+
+- name: Perplexity API Key (prefixed, standalone)
+  id: np.ai.8
+
+  pattern: |
+    (?x)
+    \b(pplx-[A-Za-z0-9]{48})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Perplexity AI API key with pplx- prefix was detected.
+
+  references:
+  - https://docs.perplexity.ai/guides/getting-started
+
+  examples:
+  - 'pplx-aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234567890'
+
+- name: Stability AI API Key
+  id: np.ai.9
+
+  pattern: |
+    (?x)(?i)
+    (?:stability|stable[_-]?diffusion)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    (sk-[A-Za-z0-9]{48,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Stability AI API key was detected.
+    An attacker could generate images and consume credits.
+
+  references:
+  - https://platform.stability.ai/docs/api-reference
+
+  examples:
+  - 'STABILITY_API_KEY="sk-aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789012345678901234"'
+
+- name: Google Gemini API Key
+  id: np.ai.10
+
+  pattern: |
+    (?x)(?i)
+    (?:gemini|google[_-]?ai)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    (AIzaSy[A-Za-z0-9_-]{33})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Google Gemini/AI Studio API key was detected.
+
+  references:
+  - https://ai.google.dev/gemini-api/docs/api-key
+
+  examples:
+  - 'GEMINI_API_KEY="AIzaSyA1b2C3d4E5f6G7h8I9j0KlMnOpQrStUvW"'
+
+- name: Voyage AI API Key
+  id: np.ai.11
+
+  pattern: |
+    (?x)(?i)
+    (?:voyage|voyageai)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    (pa-[A-Za-z0-9_-]{40,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Voyage AI API key was detected.
+
+  references:
+  - https://docs.voyageai.com/docs/api-key-and-installation
+
+  examples:
+  - 'VOYAGE_API_KEY="pa-aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234"'
+
+- name: Pinecone API Key
+  id: np.ai.12
+
+  pattern: |
+    (?x)(?i)
+    (?:pinecone)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Pinecone vector database API key was detected.
+    An attacker could read, modify, or delete vector embeddings.
+
+  references:
+  - https://docs.pinecone.io/guides/get-started/authentication
+
+  examples:
+  - 'PINECONE_API_KEY="a1b2c3d4-e5f6-7890-abcd-ef1234567890"'
+
+- name: Weaviate API Key
+  id: np.ai.13
+
+  pattern: |
+    (?x)(?i)
+    (?:weaviate)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{40,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Weaviate vector database API key was detected.
+
+  references:
+  - https://weaviate.io/developers/weaviate/configuration/authentication
+
+  examples:
+  - 'WEAVIATE_API_KEY="aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234"'

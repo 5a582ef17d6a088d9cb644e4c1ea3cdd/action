@@ -1,0 +1,430 @@
+# Custom rules for detecting cryptocurrency wallet keys, seed phrases,
+# and exchange API credentials in source code and configuration files.
+
+rules:
+
+# ============================================================
+# Private Keys
+# ============================================================
+
+- name: Bitcoin Private Key (WIF Uncompressed)
+  id: np.crypto.1
+
+  pattern: |
+    (?x)
+    \b(5[HJK][1-9A-HJ-NP-Za-km-z]{49})\b
+
+  categories: [secret]
+
+  description: |
+    A Bitcoin private key in Wallet Import Format (uncompressed) was detected.
+    An attacker with this key can transfer all funds from the associated wallet.
+
+  references:
+  - https://en.bitcoin.it/wiki/Wallet_import_format
+
+  examples:
+  - '5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ'
+  - 'PRIVATE_KEY=5Jbhv3WGhYFVokkJMidQwkZXSAzHoHXsGQWHYBTRAEboiSRjpgL'
+
+  negative_examples:
+  - '5short'
+  - '5HHHHHHHHHHHH'
+
+- name: Bitcoin Private Key (WIF Compressed)
+  id: np.crypto.2
+
+  pattern: |
+    (?x)
+    \b([KL][1-9A-HJ-NP-Za-km-z]{51})\b
+
+  categories: [secret]
+
+  description: |
+    A Bitcoin private key in Wallet Import Format (compressed) was detected.
+    An attacker with this key can transfer all funds from the associated wallet.
+
+  references:
+  - https://en.bitcoin.it/wiki/Wallet_import_format
+
+  examples:
+  - 'KwdMAjGmerYanjeui5SHS7JkmpZvVipYvB2LJGU1ZxJwYvP98617'
+  - 'L1aW4aubDFB7yfras2S1mN3bqg9nwySY8nkoLmJebSLD5BWv3ENZ'
+
+  negative_examples:
+  - 'KshortKey'
+
+- name: Ethereum Private Key
+  id: np.crypto.3
+
+  pattern: |
+    (?x)
+    (?:private[_-]?key|PRIVATE[_-]?KEY|priv[_-]?key)\s*[:=]\s*['"]?
+    ((?:0x)?[0-9a-fA-F]{64})
+    ['"]?
+
+  categories: [secret]
+
+  description: |
+    An Ethereum private key (256-bit hex) was detected alongside a key identifier.
+    An attacker with this key has full control of the associated Ethereum/EVM wallet.
+
+  references:
+  - https://ethereum.org/en/developers/docs/accounts/
+
+  examples:
+  - 'private_key=4c0883a69102937d6231471b5dbb6204fe512961708279f29a3ebf2e6356b4d8'
+  - 'PRIVATE_KEY="0x4c0883a69102937d6231471b5dbb6204fe512961708279f29a3ebf2e6356b4d8"'
+  - "priv_key: '4c0883a69102937d6231471b5dbb6204fe512961708279f29a3ebf2e6356b4d8'"
+
+  negative_examples:
+  - 'transaction_hash=4c0883a69102937d6231471b5dbb6204fe512961708279f29a3ebf2e6356b4d8'
+
+- name: Solana Private Key (Base58)
+  id: np.crypto.4
+
+  pattern: |
+    (?x)
+    (?:private[_-]?key|PRIVATE[_-]?KEY|secret[_-]?key|SECRET[_-]?KEY)\s*[:=]\s*['"]?
+    ([1-9A-HJ-NP-Za-km-z]{87,88})
+    ['"]?
+
+  categories: [secret]
+
+  description: |
+    A Solana private key (base58-encoded, 64 bytes) was detected.
+    An attacker with this key has full control of the associated Solana wallet.
+
+  references:
+  - https://docs.solana.com/cli/manage-stake-accounts
+
+  examples:
+  - 'PRIVATE_KEY=4wBqpZM9xaSheZzJSMYHGKBLaFMi7BrRdBhkMvTMiGJBbxSe63wPFRHNBCo7AhBuVb5pRRJzGMnJQe4G2G1bFci'
+
+  negative_examples:
+  - 'address=DRpbCBMxVnDK7maPMoGQdFKUosfRzDkJhbV3EXkfY8qU'
+
+# ============================================================
+# Seed / Mnemonic Phrases (BIP-39)
+# ============================================================
+
+- name: Mnemonic Seed Phrase (12 words)
+  id: np.crypto.5
+
+  pattern: |
+    (?x)(?i)
+    (?:mnemonic|seed|recovery|backup|phrase|words)\s*[:=]\s*['"]?
+    ((?:[a-z]+\s+){11}[a-z]+)
+    ['"]?
+
+  categories: [fuzzy, secret]
+
+  description: |
+    A 12-word BIP-39 mnemonic seed phrase was detected.
+    An attacker with this phrase can recover and drain all associated wallets.
+
+  references:
+  - https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
+
+  examples:
+  - 'mnemonic="abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"'
+  - "SEED='letter advice cage absurd amount doctor acoustic avoid letter advice cage above'"
+  - 'recovery: zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong'
+
+  negative_examples:
+  - 'description="this is just a regular sentence with twelve words in it total now"'
+
+- name: Mnemonic Seed Phrase (24 words)
+  id: np.crypto.6
+
+  pattern: |
+    (?x)(?i)
+    (?:mnemonic|seed|recovery|backup|phrase|words)\s*[:=]\s*['"]?
+    ((?:[a-z]+\s+){23}[a-z]+)
+    ['"]?
+
+  categories: [fuzzy, secret]
+
+  description: |
+    A 24-word BIP-39 mnemonic seed phrase was detected.
+    An attacker with this phrase can recover and drain all associated wallets.
+
+  references:
+  - https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
+
+  examples:
+  - 'mnemonic="abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"'
+
+# ============================================================
+# Wallet Addresses (identifiers, not secrets -- but useful for recon)
+# ============================================================
+
+- name: Bitcoin Address (Legacy P2PKH)
+  id: np.crypto.10
+
+  pattern: |
+    (?x)
+    (?:address|addr|wallet|btc|bitcoin|deposit|withdraw)\s*[:=]\s*['"]?
+    (1[1-9A-HJ-NP-Za-km-z]{25,34})
+    ['"]?
+
+  categories: [identifier]
+
+  description: |
+    A Bitcoin legacy (P2PKH) address was detected alongside a wallet/address keyword.
+    This is a public identifier, not a secret, but may indicate hardcoded wallet usage.
+
+  references:
+  - https://en.bitcoin.it/wiki/Address
+
+  examples:
+  - 'address=1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'
+  - 'btc="1BoatSLRHtKNngkdXEeobR76b53LETtpyT"'
+
+  negative_examples:
+  - '100000000000000000000'
+
+- name: Bitcoin Address (Bech32/SegWit)
+  id: np.crypto.11
+
+  pattern: |
+    (?x)
+    (?:address|addr|wallet|btc|bitcoin|deposit|withdraw)\s*[:=]\s*['"]?
+    (bc1[a-zA-HJ-NP-Z0-9]{25,62})
+    ['"]?
+
+  categories: [identifier]
+
+  description: |
+    A Bitcoin bech32 (SegWit) address was detected alongside a wallet/address keyword.
+
+  references:
+  - https://en.bitcoin.it/wiki/Bech32
+
+  examples:
+  - 'address=bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq'
+  - 'wallet="bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"'
+
+- name: Ethereum Address
+  id: np.crypto.12
+
+  pattern: |
+    (?x)
+    (?:address|addr|wallet|eth|ethereum|deposit|withdraw|recipient|to)\s*[:=]\s*['"]?
+    (0x[0-9a-fA-F]{40})
+    ['"]?
+
+  categories: [identifier]
+
+  description: |
+    An Ethereum address (0x + 40 hex) was detected alongside an address/wallet keyword.
+
+  references:
+  - https://ethereum.org/en/developers/docs/accounts/
+
+  examples:
+  - 'address=0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe'
+  - 'ETH_WALLET="0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18"'
+
+  negative_examples:
+  - 'tx_hash=0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe'
+
+- name: Monero Address
+  id: np.crypto.13
+
+  pattern: |
+    (?x)
+    (?:address|addr|wallet|xmr|monero|deposit|withdraw)\s*[:=]\s*['"]?
+    (4[0-9AB][1-9A-HJ-NP-Za-km-z]{93})
+    ['"]?
+
+  categories: [identifier]
+
+  description: |
+    A Monero (XMR) address was detected alongside a wallet/address keyword.
+
+  references:
+  - https://www.getmonero.org/resources/moneropedia/address.html
+
+  examples:
+  - 'xmr="49kkJLSmTSSvFRBBaJMRPj9LBTRGHcgFKPQ3G5D2sM3H65mYKHdBcQfR3GnFJFsiVGzT7Bz3RoriR4kE6AXjFCP7wWJikc"'
+
+# ============================================================
+# Crypto Exchange API Keys
+# ============================================================
+
+- name: Binance API Key
+  id: np.crypto.20
+
+  pattern: |
+    (?x)(?i)
+    (?:binance)[_-]?(?:api)?[_-]?(?:key|secret)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{64})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Binance API key or secret was detected.
+    An attacker could use it to trade, withdraw funds, or access account data.
+
+  references:
+  - https://binance-docs.github.io/apidocs/spot/en/
+
+  examples:
+  - 'BINANCE_API_KEY=vmPUZE6mv9SD5VNHk4HlWFsOr6aKE2zvsw0MuIgwCIPy6utIco14y7Ju91duEh8A'
+  - 'binance_secret="NhqPtmdSJYdKjVHjA7PZj4Mge3R5YNiP1e3UZjInClVN65XAbvqqM6A7H5fATj0j"'
+
+  negative_examples:
+  - 'BINANCE_API_KEY=test'
+
+- name: Coinbase API Key
+  id: np.crypto.21
+
+  pattern: |
+    (?x)(?i)
+    (?:coinbase)[_-]?(?:api)?[_-]?(?:key|secret)\s*[:=]\s*['"]?
+    ([A-Za-z0-9+/]{40,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Coinbase API key or secret was detected.
+    An attacker could use it to access account data and perform transactions.
+
+  references:
+  - https://docs.cdp.coinbase.com/sign-in-with-coinbase/docs/api-key-authentication
+
+  examples:
+  - 'COINBASE_API_SECRET="kbv4MJKiPenST4yzN4wXoKW3vZOBGcjfKL4ase8GvR5ADe3bWNaBuQ56v3sHYfkp"'
+
+- name: Kraken API Key
+  id: np.crypto.22
+
+  pattern: |
+    (?x)(?i)
+    (?:kraken)[_-]?(?:api)?[_-]?(?:key|secret)\s*[:=]\s*['"]?
+    ([A-Za-z0-9+/=]{40,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Kraken API key or secret was detected.
+    An attacker could use it to trade or withdraw funds.
+
+  references:
+  - https://docs.kraken.com/api/
+
+  examples:
+  - 'KRAKEN_API_KEY="kQH5HW/8p1uGOVjbgWA7FunAmGO8lsSUXNsu3eow76sz84Q18fWxnyRzBHCd3pd5nE9qa99HAZtuZuj6F1huXg=="'
+
+- name: Kucoin API Key
+  id: np.crypto.23
+
+  pattern: |
+    (?x)(?i)
+    (?:kucoin)[_-]?(?:api)?[_-]?(?:key|secret|passphrase)\s*[:=]\s*['"]?
+    ([A-Za-z0-9-]{20,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A KuCoin API key, secret, or passphrase was detected.
+
+  references:
+  - https://www.kucoin.com/docs/beginners/general
+
+  examples:
+  - 'KUCOIN_API_KEY="61e510af4c097a0001e5b3e8"'
+
+# ============================================================
+# Blockchain RPC / Infura / Alchemy
+# ============================================================
+
+- name: Infura API Key
+  id: np.crypto.30
+
+  pattern: |
+    (?x)(?i)
+    (?:infura)[_-]?(?:api)?[_-]?(?:key|secret|id|project)\s*[:=]\s*['"]?
+    ([a-f0-9]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    An Infura project ID or API key was detected.
+    An attacker could use it to access blockchain RPC endpoints at your expense.
+
+  references:
+  - https://docs.infura.io/api
+
+  examples:
+  - 'INFURA_API_KEY="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: Alchemy API Key
+  id: np.crypto.31
+
+  pattern: |
+    (?x)(?i)
+    (?:alchemy)[_-]?(?:api)?[_-]?(?:key|secret|id)\s*[:=]\s*['"]?
+    ([A-Za-z0-9_-]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    An Alchemy API key was detected.
+    An attacker could use it to access blockchain RPC endpoints at your expense.
+
+  references:
+  - https://docs.alchemy.com/reference/api-overview
+
+  examples:
+  - 'ALCHEMY_API_KEY="Ab1Cd2Ef3Gh4Ij5Kl6Mn7Op8Qr9St0Uv"'
+
+- name: Etherscan API Key
+  id: np.crypto.32
+
+  pattern: |
+    (?x)(?i)
+    (?:etherscan)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([A-Z0-9]{34})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    An Etherscan API key was detected.
+
+  references:
+  - https://docs.etherscan.io/getting-started/viewing-api-usage-statistics
+
+  examples:
+  - 'ETHERSCAN_API_KEY="YQ3IA5HRW4ATZIA8GN14V3T2EHREWV5ATC"'
+
+# ============================================================
+# Wallet Files / Keystore
+# ============================================================
+
+- name: Ethereum Keystore File
+  id: np.crypto.40
+
+  pattern: |
+    (?x)
+    "crypto"\s*:\s*\{\s*"cipher"\s*:\s*"(aes-128-ctr)"
+
+  categories: [fuzzy, secret]
+
+  description: |
+    An Ethereum keystore JSON file (UTC/JSON format) was detected.
+    If the password is weak, an attacker can brute-force it to extract the private key.
+
+  references:
+  - https://ethereum.org/en/developers/docs/accounts/#keystore-files
+
+  examples:
+  - '{"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"6087dab2f9fdbbfaddc31a909735c1e6"}}}'

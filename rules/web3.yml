@@ -1,0 +1,220 @@
+# Detection rules for Web3 infrastructure, IPFS, and blockchain service providers.
+# Covers platforms NOT in crypto.yml (which has Infura, Alchemy, Etherscan, exchanges).
+
+rules:
+
+- name: Moralis API Key
+  id: np.web3.1
+
+  pattern: |
+    (?x)(?i)
+    (?:moralis)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    (eyJ[A-Za-z0-9_-]{80,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Moralis Web3 API key was detected.
+    An attacker could query blockchain data, NFT metadata, and token balances.
+
+  references:
+  - https://docs.moralis.io/web3-data-api/evm/get-your-api-key
+
+  examples:
+  - 'MORALIS_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjEyMzQ1Njc4OTAiLCJvcmdJZCI6ImFiY2RlZiIsImlhdCI6MTY4Nzk2MjgwMH0"'
+
+- name: QuickNode Endpoint URL
+  id: np.web3.2
+
+  pattern: |
+    (?x)
+    (https://[a-z0-9-]+\.(?:quiknode|discover\.quiknode)\.pro/[a-f0-9]{40,})
+
+  categories: [api, secret]
+
+  description: |
+    A QuickNode RPC endpoint URL was detected.
+    An attacker could use it to make blockchain RPC calls at your expense.
+
+  references:
+  - https://www.quicknode.com/docs
+
+  examples:
+  - 'https://my-cool-name.quiknode.pro/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9d0/'
+
+- name: Pinata API Key
+  id: np.web3.3
+
+  pattern: |
+    (?x)(?i)
+    (?:pinata)[_-]?(?:api)?[_-]?(?:key|token|secret|jwt)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{30,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Pinata IPFS API key or JWT was detected.
+    An attacker could pin/unpin files, or consume storage quota.
+
+  references:
+  - https://docs.pinata.cloud/api-reference/authentication
+
+  examples:
+  - 'PINATA_API_KEY="aBcDeFgHiJkLmNoPqRsTuVwXyZ123456"'
+
+- name: Ankr API Key
+  id: np.web3.4
+
+  pattern: |
+    (?x)(?i)
+    (?:ankr)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([a-f0-9]{64})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    An Ankr blockchain API key was detected.
+
+  references:
+  - https://www.ankr.com/docs/rpc-service/getting-started/
+
+  examples:
+  - 'ANKR_API_KEY="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: Ankr Premium RPC URL
+  id: np.web3.5
+
+  pattern: |
+    (?x)
+    (https://rpc\.ankr\.com/[a-z0-9_]+/[A-Za-z0-9]{64})
+
+  categories: [api, secret]
+
+  description: |
+    An Ankr Premium RPC endpoint URL with embedded API key was detected.
+
+  references:
+  - https://www.ankr.com/docs/rpc-service/getting-started/
+
+  examples:
+  - 'https://rpc.ankr.com/eth/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6'
+
+- name: Infura RPC URL
+  id: np.web3.6
+
+  pattern: |
+    (?x)
+    (https://(?:mainnet|goerli|sepolia|polygon-mainnet|arbitrum-mainnet|optimism-mainnet)\.infura\.io/v3/[a-f0-9]{32})
+
+  categories: [api, secret]
+
+  description: |
+    An Infura RPC endpoint URL with embedded project ID was detected.
+
+  references:
+  - https://docs.infura.io/api
+
+  examples:
+  - 'https://mainnet.infura.io/v3/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6'
+
+- name: Alchemy RPC URL
+  id: np.web3.7
+
+  pattern: |
+    (?x)
+    (https://(?:eth|polygon|arb|opt|base)-(?:mainnet|sepolia|goerli)\.g\.alchemy\.com/v2/[A-Za-z0-9_-]{32})
+
+  categories: [api, secret]
+
+  description: |
+    An Alchemy RPC endpoint URL with embedded API key was detected.
+
+  references:
+  - https://docs.alchemy.com/reference/api-overview
+
+  examples:
+  - 'https://eth-mainnet.g.alchemy.com/v2/Ab1Cd2Ef3Gh4Ij5Kl6Mn7Op8Qr9St0Uv'
+
+- name: WalletConnect Project ID
+  id: np.web3.8
+
+  pattern: |
+    (?x)(?i)
+    (?:walletconnect|wc)[_-]?(?:project)?[_-]?(?:id|key)\s*[:=]\s*['"]?
+    ([0-9a-f]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A WalletConnect project ID was detected.
+
+  references:
+  - https://docs.walletconnect.com/cloud/relay
+
+  examples:
+  - 'WALLETCONNECT_PROJECT_ID="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: Helius API Key
+  id: np.web3.9
+
+  pattern: |
+    (?x)(?i)
+    (?:helius)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Helius (Solana RPC/API) API key was detected.
+
+  references:
+  - https://docs.helius.dev/welcome/what-is-helius
+
+  examples:
+  - 'HELIUS_API_KEY="a1b2c3d4-e5f6-7890-abcd-ef1234567890"'
+
+- name: Helius RPC URL
+  id: np.web3.10
+
+  pattern: |
+    (?x)
+    (https://(?:mainnet|devnet)\.helius-rpc\.com/\?api-key=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})
+
+  categories: [api, secret]
+
+  description: |
+    A Helius Solana RPC endpoint URL with API key was detected.
+
+  references:
+  - https://docs.helius.dev/welcome/what-is-helius
+
+  examples:
+  - 'https://mainnet.helius-rpc.com/?api-key=a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+
+- name: Chainlink Node Credentials
+  id: np.web3.11
+
+  pattern: |
+    (?x)(?i)
+    (?:chainlink)[_-]?(?:node)?[_-]?(?:password|pass|secret)\s*[:=]\s*['"]?
+    ([^\s'"]{12,})
+    ['"]?
+
+  categories: [fuzzy, secret]
+
+  description: |
+    Chainlink node credentials were detected.
+
+  references:
+  - https://docs.chain.link/chainlink-nodes
+
+  examples:
+  - 'CHAINLINK_NODE_PASSWORD="MyStr0ngN0deP@ss!"'
+
+  negative_examples:
+  - 'CHAINLINK_NODE_PASSWORD=${NODE_PASS}'

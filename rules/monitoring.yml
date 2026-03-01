@@ -1,0 +1,209 @@
+# Detection rules for monitoring, observability, and error tracking platforms.
+# Covers platforms NOT in Noseyparker defaults (which has Grafana, New Relic, Dynatrace).
+
+rules:
+
+- name: Datadog API Key
+  id: np.mon.1
+
+  pattern: |
+    (?x)(?i)
+    (?:datadog|dd)[_-]?(?:api)?[_-]?(?:key)\s*[:=]\s*['"]?
+    ([0-9a-f]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Datadog API key was detected.
+    An attacker could send metrics, access dashboards, or read monitoring data.
+
+  references:
+  - https://docs.datadoghq.com/account_management/api-app-keys/
+
+  examples:
+  - 'DD_API_KEY="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: Datadog Application Key
+  id: np.mon.2
+
+  pattern: |
+    (?x)(?i)
+    (?:datadog|dd)[_-]?(?:app|application)[_-]?(?:key)\s*[:=]\s*['"]?
+    ([0-9a-f]{40})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Datadog application key was detected.
+    Combined with an API key, an attacker gets full management access.
+
+  references:
+  - https://docs.datadoghq.com/account_management/api-app-keys/
+
+  examples:
+  - 'DD_APP_KEY="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9d0"'
+
+- name: Sentry DSN
+  id: np.mon.3
+
+  pattern: |
+    (?x)
+    (https://[0-9a-f]{32}@[^\s/]+\.ingest\.(?:us\.)?sentry\.io/\d+)
+
+  categories: [api, secret]
+
+  description: |
+    A Sentry DSN (Data Source Name) was detected.
+    An attacker could send fake error reports or exfiltrate data through events.
+
+  references:
+  - https://docs.sentry.io/concepts/key-terms/dsn-explainer/
+
+  examples:
+  - 'https://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6@o123456.ingest.sentry.io/7654321'
+  - 'https://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6@o123456.ingest.us.sentry.io/7654321'
+
+- name: Sentry Auth Token
+  id: np.mon.4
+
+  pattern: |
+    (?x)
+    \b(sntrys_[A-Za-z0-9]{60,})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Sentry authentication token was detected.
+    An attacker could manage projects, releases, and organization settings.
+
+  references:
+  - https://docs.sentry.io/api/auth/
+
+  examples:
+  - 'sntrys_eyJpYXQiOjE3MDkxMjM0NTYsInVybCI6Imh0dHBzOi8vc2VudHJ5Lmlv'
+
+- name: PagerDuty API Key
+  id: np.mon.5
+
+  pattern: |
+    (?x)(?i)
+    (?:pagerduty|pd)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([A-Za-z0-9_+-]{20})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A PagerDuty API key was detected.
+    An attacker could trigger, acknowledge, or resolve incidents.
+
+  references:
+  - https://support.pagerduty.com/docs/api-access-keys
+
+  examples:
+  - 'PAGERDUTY_API_KEY="u+abCdEfGhIjKlMnOpQr"'
+
+- name: PagerDuty Integration Key
+  id: np.mon.6
+
+  pattern: |
+    (?x)(?i)
+    (?:pagerduty|pd)[_-]?(?:integration|routing|service)[_-]?(?:key)\s*[:=]\s*['"]?
+    ([0-9a-f]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A PagerDuty integration/routing key was detected.
+    An attacker could send fake alerts to on-call teams.
+
+  references:
+  - https://support.pagerduty.com/docs/services-and-integrations
+
+  examples:
+  - 'PD_INTEGRATION_KEY="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: Logz.io Token
+  id: np.mon.7
+
+  pattern: |
+    (?x)(?i)
+    (?:logzio|logz)[_-]?(?:api)?[_-]?(?:token|key)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{32,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Logz.io shipping/API token was detected.
+    An attacker could read or inject log data.
+
+  references:
+  - https://docs.logz.io/docs/user-guide/admin/authentication-tokens/api-tokens/
+
+  examples:
+  - 'LOGZIO_TOKEN="aBcDeFgHiJkLmNoPqRsTuVwXyZ123456"'
+
+- name: Honeybadger API Key
+  id: np.mon.8
+
+  pattern: |
+    (?x)(?i)
+    (?:honeybadger)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([a-f0-9]{8})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Honeybadger API key was detected.
+
+  references:
+  - https://docs.honeybadger.io/api/
+
+  examples:
+  - 'HONEYBADGER_API_KEY="a1b2c3d4"'
+
+- name: Rollbar Access Token
+  id: np.mon.9
+
+  pattern: |
+    (?x)(?i)
+    (?:rollbar)[_-]?(?:access)?[_-]?(?:token|key)\s*[:=]\s*['"]?
+    ([0-9a-f]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Rollbar access token was detected.
+    An attacker could read error data or send fake reports.
+
+  references:
+  - https://docs.rollbar.com/reference/getting-started-1
+
+  examples:
+  - 'ROLLBAR_ACCESS_TOKEN="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: Bugsnag API Key
+  id: np.mon.10
+
+  pattern: |
+    (?x)(?i)
+    (?:bugsnag)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([0-9a-f]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Bugsnag API key was detected.
+
+  references:
+  - https://docs.bugsnag.com/api/
+
+  examples:
+  - 'BUGSNAG_API_KEY="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'

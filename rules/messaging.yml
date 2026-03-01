@@ -1,0 +1,230 @@
+# Detection rules for messaging, notification, and communication platforms.
+# Covers platforms NOT in Noseyparker defaults (which has Telegram, Twilio, Slack, MS Teams).
+
+rules:
+
+- name: Vonage/Nexmo API Credentials
+  id: np.msg.1
+
+  pattern: |
+    (?x)(?i)
+    (?:vonage|nexmo)[_-]?(?:api)?[_-]?(?:secret|key)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{16,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    Vonage/Nexmo API credentials were detected.
+    An attacker could send SMS, make voice calls, or access communication logs.
+
+  references:
+  - https://developer.vonage.com/en/getting-started/overview
+
+  examples:
+  - 'NEXMO_API_SECRET="aBcDeFgH12345678"'
+  - 'VONAGE_API_KEY="a1b2c3d4e5f6a7b8"'
+
+- name: Pushover API Token
+  id: np.msg.2
+
+  pattern: |
+    (?x)(?i)
+    (?:pushover)[_-]?(?:api)?[_-]?(?:token|key|app)\s*[:=]\s*['"]?
+    ([a-z0-9]{30})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Pushover API token was detected.
+    An attacker could send push notifications to devices.
+
+  references:
+  - https://pushover.net/api
+
+  examples:
+  - 'PUSHOVER_TOKEN="azgqxbqjhwzgpsnv0bxe0oo6j8u0a1"'
+
+- name: Pushover User Key
+  id: np.msg.3
+
+  pattern: |
+    (?x)(?i)
+    (?:pushover)[_-]?(?:user)?[_-]?(?:key)\s*[:=]\s*['"]?
+    ([a-z0-9]{30})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Pushover user key was detected.
+
+  references:
+  - https://pushover.net/api
+
+  examples:
+  - 'PUSHOVER_USER_KEY="uqiic3nwao4gvak8jm7fj4d6z0bv7e"'
+
+- name: OneSignal API Key
+  id: np.msg.4
+
+  pattern: |
+    (?x)(?i)
+    (?:onesignal)[_-]?(?:api|rest)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{48})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A OneSignal REST API key was detected.
+    An attacker could send push notifications to all app users.
+
+  references:
+  - https://documentation.onesignal.com/reference/create-notification
+
+  examples:
+  - 'ONESIGNAL_API_KEY="aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234567890ab"'
+
+- name: LINE Notify Token
+  id: np.msg.5
+
+  pattern: |
+    (?x)(?i)
+    (?:line)[_-]?(?:notify)?[_-]?(?:token|key)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{43})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A LINE Notify access token was detected.
+    An attacker could send messages to LINE groups or users.
+
+  references:
+  - https://notify-bot.line.me/doc/en/
+
+  examples:
+  - 'LINE_NOTIFY_TOKEN="aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234567"'
+
+- name: LINE Channel Secret
+  id: np.msg.6
+
+  pattern: |
+    (?x)(?i)
+    (?:line)[_-]?(?:channel)?[_-]?(?:secret)\s*[:=]\s*['"]?
+    ([0-9a-f]{32})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A LINE channel secret was detected.
+    An attacker could impersonate a LINE bot.
+
+  references:
+  - https://developers.line.biz/en/docs/messaging-api/
+
+  examples:
+  - 'LINE_CHANNEL_SECRET="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"'
+
+- name: WhatsApp Business API Key
+  id: np.msg.7
+
+  pattern: |
+    (?x)(?i)
+    (?:whatsapp|waba)[_-]?(?:api)?[_-]?(?:token|key|secret)\s*[:=]\s*['"]?
+    (EAA[A-Za-z0-9]{100,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A WhatsApp Business API (Meta Graph API) token was detected.
+    An attacker could send messages, read conversations, or access business data.
+
+  references:
+  - https://developers.facebook.com/docs/whatsapp/cloud-api/get-started
+
+  examples:
+  - 'WHATSAPP_TOKEN="EAAaBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890aBcDeFgHiJkLmNoPqRs"'
+
+- name: Resend API Key
+  id: np.msg.8
+
+  pattern: |
+    (?x)
+    \b(re_[A-Za-z0-9]{30,})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Resend email API key (re_ prefix) was detected.
+    An attacker could send emails from your domain.
+
+  references:
+  - https://resend.com/docs/api-reference/introduction
+
+  examples:
+  - 're_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234'
+
+- name: Brevo/Sendinblue API Key
+  id: np.msg.9
+
+  pattern: |
+    (?x)(?i)
+    (?:brevo|sendinblue|sib)[_-]?(?:api)?[_-]?(?:key|token)\s*[:=]\s*['"]?
+    (xkeysib-[A-Za-z0-9]{64}-[A-Za-z0-9]+)
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Brevo (formerly Sendinblue) API key was detected.
+    An attacker could send bulk emails, SMS, or access contact lists.
+
+  references:
+  - https://developers.brevo.com/docs/getting-started
+
+  examples:
+  - 'BREVO_API_KEY="xkeysib-aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234567890aBcDeFgHiJkLm-NoPqRs"'
+
+- name: Brevo/Sendinblue API Key (standalone)
+  id: np.msg.10
+
+  pattern: |
+    (?x)
+    \b(xkeysib-[A-Za-z0-9]{64}-[A-Za-z0-9]+)\b
+
+  categories: [api, secret]
+
+  description: |
+    A Brevo (formerly Sendinblue) API key with xkeysib- prefix was detected.
+
+  references:
+  - https://developers.brevo.com/docs/getting-started
+
+  examples:
+  - 'xkeysib-aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678901234567890aBcDeFgHiJkLm-NoPqRs'
+
+- name: Discord Bot Token
+  id: np.msg.11
+
+  pattern: |
+    (?x)(?i)
+    (?:discord)[_-]?(?:bot)?[_-]?(?:token|key)\s*[:=]\s*['"]?
+    ([A-Za-z0-9_-]{24}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Discord bot token was detected.
+    An attacker could control the bot, read messages, and access servers.
+
+  references:
+  - https://discord.com/developers/docs/reference#authentication
+
+  examples:
+  - 'DISCORD_BOT_TOKEN="MTIzNDU2Nzg5MDEyMzQ1Njc4.GaBcDe.aBcDeFgHiJkLmNoPqRsTuVwXyZ12"'

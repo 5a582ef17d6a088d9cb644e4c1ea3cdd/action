@@ -1,0 +1,20 @@
+# SSH keys & secrets
+.ssh/
+
+# Scripts & template (not needed in remote)
+*.sh
+action.yaml.tpl
+
+# IDE
+.idea/
+*.iml
+
+# Claude Code
+.claude/
+
+# Build output
+out.*
+out.yml
+
+# Legacy
+reset.cmd

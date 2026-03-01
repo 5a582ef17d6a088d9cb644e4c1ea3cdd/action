@@ -1,0 +1,221 @@
+# Detection rules for payment gateway and fintech platform credentials.
+# Covers platforms NOT in Noseyparker defaults (which has Stripe, Square, Shopify)
+# and NOT in extra.yml (which has PayPal).
+
+rules:
+
+- name: Razorpay API Key
+  id: np.pay.1
+
+  pattern: |
+    (?x)
+    \b(rzp_(?:live|test)_[A-Za-z0-9]{14,})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Razorpay API key was detected.
+    An attacker could process payments, issue refunds, or access transaction data.
+
+  references:
+  - https://razorpay.com/docs/api/
+
+  examples:
+  - 'rzp_live_aBcDeFgHiJkLmN'
+  - 'rzp_test_1234567890abcd'
+
+- name: Razorpay Secret Key
+  id: np.pay.2
+
+  pattern: |
+    (?x)(?i)
+    (?:razorpay)[_-]?(?:key)?[_-]?(?:secret)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{20,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A Razorpay API secret key was detected.
+
+  references:
+  - https://razorpay.com/docs/api/
+
+  examples:
+  - 'RAZORPAY_KEY_SECRET="aBcDeFgHiJkLmNoPqRsT"'
+
+- name: Midtrans Server Key
+  id: np.pay.3
+
+  pattern: |
+    (?x)
+    \b((?:SB-)?Mid-server-[A-Za-z0-9_-]{20,})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Midtrans server key was detected.
+    An attacker could process payments or issue refunds on Midtrans (Indonesian payment gateway).
+
+  references:
+  - https://docs.midtrans.com/reference/api-header
+
+  examples:
+  - 'Mid-server-aBcDeFgHiJkLmNoPqRsT'
+  - 'SB-Mid-server-aBcDeFgHiJkLmNoPqRsT'
+
+- name: Midtrans Client Key
+  id: np.pay.4
+
+  pattern: |
+    (?x)
+    \b((?:SB-)?Mid-client-[A-Za-z0-9_-]{20,})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Midtrans client key was detected.
+
+  references:
+  - https://docs.midtrans.com/reference/api-header
+
+  examples:
+  - 'Mid-client-aBcDeFgHiJkLmNoPqRsT'
+  - 'SB-Mid-client-aBcDeFgHiJkLmNoPqRsT'
+
+- name: Xendit API Key
+  id: np.pay.5
+
+  pattern: |
+    (?x)
+    \b(xnd_(?:development|production)_[A-Za-z0-9]{30,})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Xendit API key was detected.
+    An attacker could process payments, disbursements, or access financial data (Southeast Asia).
+
+  references:
+  - https://developers.xendit.co/api-reference/
+
+  examples:
+  - 'xnd_development_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234'
+  - 'xnd_production_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234'
+
+- name: Flutterwave API Key
+  id: np.pay.6
+
+  pattern: |
+    (?x)
+    \b(FLWSECK_TEST-[a-f0-9]{32}-X|FLWSECK-[a-f0-9]{32}-X)\b
+
+  categories: [api, secret]
+
+  description: |
+    A Flutterwave secret key was detected.
+    An attacker could process payments or access transaction data (Africa).
+
+  references:
+  - https://developer.flutterwave.com/docs/integration-guides/authentication
+
+  examples:
+  - 'FLWSECK_TEST-a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6-X'
+  - 'FLWSECK-a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6-X'
+
+- name: Flutterwave Public Key
+  id: np.pay.7
+
+  pattern: |
+    (?x)
+    \b(FLWPUBK_TEST-[a-f0-9]{32}-X|FLWPUBK-[a-f0-9]{32}-X)\b
+
+  categories: [api, secret]
+
+  description: |
+    A Flutterwave public key was detected.
+
+  references:
+  - https://developer.flutterwave.com/docs/integration-guides/authentication
+
+  examples:
+  - 'FLWPUBK_TEST-a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6-X'
+
+- name: Mercado Pago Access Token
+  id: np.pay.8
+
+  pattern: |
+    (?x)
+    \b(APP_USR-\d+-\d+-[a-f0-9]{32}-\d+)\b
+
+  categories: [api, secret]
+
+  description: |
+    A Mercado Pago access token was detected.
+    An attacker could process payments or access financial data (Latin America).
+
+  references:
+  - https://www.mercadopago.com.br/developers/en/reference
+
+  examples:
+  - 'APP_USR-1234567890123456-010101-a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6-123456789'
+
+- name: Paystack Secret Key
+  id: np.pay.9
+
+  pattern: |
+    (?x)
+    \b(sk_(?:live|test)_[a-f0-9]{40})\b
+
+  categories: [api, secret]
+
+  description: |
+    A Paystack secret key was detected.
+    An attacker could process payments or issue refunds (Africa).
+
+  references:
+  - https://paystack.com/docs/api/
+
+  examples:
+  - 'sk_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9d0'
+  - 'sk_test_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9d0'
+
+- name: Doku API Key
+  id: np.pay.10
+
+  pattern: |
+    (?x)(?i)
+    (?:doku)[_-]?(?:api)?[_-]?(?:key|secret|client[_-]?id)\s*[:=]\s*['"]?
+    ([A-Za-z0-9]{30,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    A DOKU payment gateway credential was detected (Indonesian payment gateway).
+
+  references:
+  - https://www.doku.com/developer
+
+  examples:
+  - 'DOKU_CLIENT_ID="aBcDeFgHiJkLmNoPqRsTuVwXyZ123456"'
+
+- name: GoPay/GoBiz Credentials
+  id: np.pay.11
+
+  pattern: |
+    (?x)(?i)
+    (?:gopay|gobiz|goto)[_-]?(?:api)?[_-]?(?:key|secret|token)\s*[:=]\s*['"]?
+    ([A-Za-z0-9_-]{30,})
+    ['"]?
+
+  categories: [api, secret]
+
+  description: |
+    GoPay/GoBiz API credentials were detected (Indonesian fintech).
+
+  references:
+  - https://developer.gojek.com/
+
+  examples:
+  - 'GOPAY_API_KEY="aBcDeFgHiJkLmNoPqRsTuVwXyZ12345678"'
